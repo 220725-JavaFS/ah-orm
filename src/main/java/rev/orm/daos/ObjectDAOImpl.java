@@ -1,6 +1,7 @@
 package rev.orm.daos;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,34 +26,32 @@ public class ObjectDAOImpl implements ObjectDAO {
 			
 			newObject = obj.getClass().getDeclaredConstructor().newInstance();
 			
-			System.out.println(newObject);
-			
 			String sql = "SELECT * FROM " + objReflection.returnObjectClassName(obj).toLowerCase()
 					+ " WHERE "+ objFieldsDB[columnNum-1] +" = "+ "'" + content + "'" + ";";
-			//System.out.println(sql);
 			Statement statement = connect.createStatement();
 			ResultSet result = statement.executeQuery(sql);
 			
 			if(result.next()) {
-				String setterName = "set" +objFields[0].substring(0,1).toUpperCase()
-						+ objFields[0].substring(1);
-				
-				Class<?> setterParamType = obj.getClass().getDeclaredField(objFields[0]).getType();
-				System.out.println(setterName);
-				System.out.println(setterParamType);
 				int counter = 0;
+
 				for(String str: objParamType) {
+					String setterName = "set" +objFields[counter].substring(0,1).toUpperCase()
+							+ objFields[counter].substring(1);
+					Class<?> setterParamType = obj.getClass().getDeclaredField(objFields[counter]).getType();
+					Method setter = obj.getClass().getMethod(setterName, setterParamType);
 					//makes a switch statement here and also make a method for these steps
+					//Refactor this code latter ^ and add the necessary primitives 
 					if(str.equals("String")){
-						
+						setter.invoke(newObject,result.getString(objFieldsDB[counter]));
+
 					}else if(str.equals("int")) {
-						
+						setter.invoke(newObject,result.getInt(objFieldsDB[counter]));
+					
 					}
+					counter++;
 				}
-				
+				return newObject;
 			}
-			
-			return newObject;
 			
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | SQLException | NoSuchFieldException e) {
@@ -66,26 +65,12 @@ public class ObjectDAOImpl implements ObjectDAO {
 	public static void main(String[] args) {
 		
 		Account account = new Account();
-
-		System.out.println("========================");
-		
-		ObjectReflection or = new ObjectReflection();
-		
-		System.out.println(or.returnObjectClassName(account).toLowerCase());
-		System.out.println("========================");
-		for(String str: or.returnDeclaredFieldsDB(account)) {
-			System.out.println(str);
-		}	
-//		String[] ty = or.returnDeclaredFields(account);
-//		System.out.println(ty[0]);
-		System.out.println("========================");
-		for(String str: or.returnParameterType(account)) {
-			System.out.println(str);
-		}
 		ObjectDAO odjDao = new ObjectDAOImpl();
 		
-		odjDao.getByContentByColumnNum("Alice",1,account);
-
+		System.out.println(odjDao.getByContentByColumnNum("Alice",1,account));
+		System.out.println(odjDao.getByContentByColumnNum("Alice",2,account));
+		System.out.println(odjDao.getByContentByColumnNum("Bob",2,account));
+		System.out.println(odjDao.getByContentByColumnNum("17401",5,account));
 
 	}
 
