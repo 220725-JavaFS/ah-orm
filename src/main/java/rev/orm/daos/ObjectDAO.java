@@ -1,10 +1,14 @@
 package rev.orm.daos;
 
+import java.util.List;
+
 public interface ObjectDAO {
 
-	//Takes a class object and returns object account by user
+	public abstract void storeObject(Object obj);
 	
-
-
-	Object getByContentByColumnNum(String content, int columnNum, Object obj);
+	public abstract Object getByContentByColumnNum(String content, int columnNum, Object obj);
+	
+	public abstract List<Object> getAll(Object obj);
+	
+	
 }

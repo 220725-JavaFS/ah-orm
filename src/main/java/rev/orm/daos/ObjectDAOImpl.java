@@ -3,9 +3,12 @@ package rev.orm.daos;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.List;
 
 import rev.orm.models.Account;
 import rev.orm.utils.ConnectionUtil;
@@ -61,20 +64,133 @@ public class ObjectDAOImpl implements ObjectDAO {
 		return null;
 	}
 	
+	@Override
+	public List<Object> getAll(Object obj) {
+		
+		Object newObject = null;
+		List<Object> newObjectList = new LinkedList<Object>();
+		String[] objFields = objReflection.returnDeclaredFields(obj);
+		String[] objFieldsDB = objReflection.returnDeclaredFieldsDB(obj);
+		String[] objParamType = objReflection.returnParameterType(obj);
+
+		try(Connection connect = ConnectionUtil.getConnection()) {
+			
+			String sql = "SELECT * FROM " + objReflection.returnObjectClassName(obj).toLowerCase() + ";";
+			Statement statement = connect.createStatement();
+			ResultSet result = statement.executeQuery(sql);
+			
+			while(result.next()) {
+				int counter = 0;
+				newObject = obj.getClass().getDeclaredConstructor().newInstance();
+				for(String str: objParamType) {
+					String setterName = "set" +objFields[counter].substring(0,1).toUpperCase()
+							+ objFields[counter].substring(1);
+					Class<?> getterParamType = obj.getClass().getDeclaredField(objFields[counter]).getType();
+					Method setter = obj.getClass().getMethod(setterName, getterParamType);
+					//makes a switch statement here and also make a method for these steps
+					//Refactor this code latter ^ and add the necessary primitives 
+					if(str.equals("String")){
+						setter.invoke(newObject,result.getString(objFieldsDB[counter]));
+
+					}else if(str.equals("int")) {
+						setter.invoke(newObject,result.getInt(objFieldsDB[counter]));
+					
+					}
+					counter++;
+				}
+				newObjectList.add(newObject);
+				
+			}
+			return newObjectList;
+			
+		} catch (SQLException | NoSuchFieldException | SecurityException | NoSuchMethodException | IllegalAccessException 
+				| IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public void storeObject(Object obj) {
+		
+		String[] objFields = objReflection.returnDeclaredFields(obj);
+		String[] objFieldsDB = objReflection.returnDeclaredFieldsDB(obj);
+		String[] objParamType = objReflection.returnParameterType(obj);
+		
+		try(Connection connect = ConnectionUtil.getConnection()) {
+			
+	
+			StringBuilder builder = new StringBuilder("INSERT INTO " + objReflection.returnObjectClassName(obj).toLowerCase()+
+					"(");
+			int temp = 1;
+			for(String field: objFieldsDB) {
+				
+				builder.append(field);
+				if(objFieldsDB.length > temp) {
+					builder.append(", ");
+					++temp;
+				}
+			}
+			builder.append(") VALUES(");
+			for(int i = 0; i < objFieldsDB.length; i++) {
+				
+				builder.append("?");
+				if(objFieldsDB.length > i+1) {
+					builder.append(", ");
+					++temp;
+				}
+			}
+			builder.append(");");
+			
+			String sql = builder.toString();
+
+			PreparedStatement statement = connect.prepareStatement(sql);
+			int counter = 0;
+			for(String field: objFields) {
+				String getterName = "get" +field.substring(0,1).toUpperCase()+ field.substring(1);
+				Method getterMethod = obj.getClass().getMethod(getterName);
+				Object fieldValue = getterMethod.invoke(obj);
+				
+				if(objParamType[counter].equals("String")){
+					statement.setString(counter+1, fieldValue.toString());
+
+				}else if(objParamType[counter].equals("int")) {
+					statement.setInt(counter+1, (int)fieldValue);
+				}
+				counter++;
+			}
+			
+			statement.execute();
+	
+		} catch (IllegalArgumentException | SecurityException | SQLException | NoSuchMethodException | 
+				IllegalAccessException | InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	//testing remove b4 final code
 	public static void main(String[] args) {
 		
 		Account account = new Account();
 		ObjectDAO odjDao = new ObjectDAOImpl();
 		
-		System.out.println(odjDao.getByContentByColumnNum("Alice",1,account));
-		System.out.println(odjDao.getByContentByColumnNum("Alice",2,account));
-		System.out.println(odjDao.getByContentByColumnNum("Bob",2,account));
-		System.out.println(odjDao.getByContentByColumnNum("17401",5,account));
+		//System.out.println(odjDao.getByContentByColumnNum("Alice",1,account));
+		//System.out.println(odjDao.getByContentByColumnNum("Alice",2,account));
+		//System.out.println(odjDao.getByContentByColumnNum("Bob",2,account));
+		//System.out.println(odjDao.getByContentByColumnNum("17401",5,account));
+		
+		List<Object> list = odjDao.getAll(account);
+		
+		for(Object obj: list) {
+			System.out.println(obj);
+		}
+		System.out.println("===============");
+		Account account2 = new Account("name1", "last1","username1","email@.com", 123456);
+		
+		odjDao.storeObject(account2);
 
 	}
-
-
-
 
 }
