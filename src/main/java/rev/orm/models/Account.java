@@ -1,7 +1,7 @@
 package rev.orm.models;
 
 import java.util.Objects;
-
+//Delete this class once finished
 public class Account {
 	
 	private String accountName;

@@ -58,7 +58,6 @@ public class ObjectDAOImpl implements ObjectDAO {
 			
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | SQLException | NoSuchFieldException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -105,7 +104,6 @@ public class ObjectDAOImpl implements ObjectDAO {
 			
 		} catch (SQLException | NoSuchFieldException | SecurityException | NoSuchMethodException | IllegalAccessException 
 				| IllegalArgumentException | InvocationTargetException | InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -166,9 +164,46 @@ public class ObjectDAOImpl implements ObjectDAO {
 	
 		} catch (IllegalArgumentException | SecurityException | SQLException | NoSuchMethodException | 
 				IllegalAccessException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public Object updateRowByColumnNum(String setContent, int setColumnNum, String whereContent, int whereColumnNum, Object obj) {
+		
+		String[] objFieldsDB = objReflection.returnDeclaredFieldsDB(obj);
+		
+		try(Connection connect = ConnectionUtil.getConnection()) {
+			
+			String sql = "UPDATE " + objReflection.returnObjectClassName(obj).toLowerCase()+
+					" SET " + objFieldsDB[setColumnNum-1] + "= '" + setContent + "' WHERE " + ""
+							+ objFieldsDB[whereColumnNum-1] + "= '" + whereContent + "';";
+			
+			PreparedStatement statement = connect.prepareStatement(sql);
+			statement.execute();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@Override
+	public Object deleteRowByColumnNum(String whereContent, int whereColumnNum, Object obj) {
+		String[] objFieldsDB = objReflection.returnDeclaredFieldsDB(obj);
+
+		try(Connection connect = ConnectionUtil.getConnection()) {
+			String sql = "DELETE FROM " + objReflection.returnObjectClassName(obj).toLowerCase()+
+					" WHERE " + objFieldsDB[whereColumnNum-1] + "= '" + whereContent + "';";
+			
+			PreparedStatement statement = connect.prepareStatement(sql);
+			statement.execute();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 	//testing remove b4 final code
 	public static void main(String[] args) {
@@ -190,7 +225,8 @@ public class ObjectDAOImpl implements ObjectDAO {
 		Account account2 = new Account("name1", "last1","username1","email@.com", 123456);
 		
 		odjDao.storeObject(account2);
-
+		//odjDao.updateRowByColumnNum("userNameUpdated2",3,"name1" ,1, account);
+		//odjDao.deleteRowByColumnNum("name1", 1, account);
 	}
 
 }
