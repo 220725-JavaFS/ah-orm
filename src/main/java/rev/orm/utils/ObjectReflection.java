@@ -38,7 +38,6 @@ public class ObjectReflection {
 		
 		Class<?> objectClass = o.getClass();
 		Field[] fields = objectClass.getDeclaredFields();
-		
 		if(fields.length > 0) {
 			String[] newArr = new String[fields.length];
 			int count = 0;

@@ -9,8 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
-
-import rev.orm.models.Account;
 import rev.orm.utils.ConnectionUtil;
 import rev.orm.utils.ObjectReflection;
 
@@ -28,7 +26,7 @@ public class ObjectDAOImpl implements ObjectDAO {
 		try(Connection connect = ConnectionUtil.getConnection()) {
 			
 			newObject = obj.getClass().getDeclaredConstructor().newInstance();
-			
+		
 			String sql = "SELECT * FROM " + objReflection.returnObjectClassName(obj).toLowerCase()
 					+ " WHERE "+ objFieldsDB[columnNum-1] +" = "+ "'" + content + "'" + ";";
 			Statement statement = connect.createStatement();
@@ -147,6 +145,7 @@ public class ObjectDAOImpl implements ObjectDAO {
 			PreparedStatement statement = connect.prepareStatement(sql);
 			int counter = 0;
 			for(String field: objFields) {
+
 				String getterName = "get" +field.substring(0,1).toUpperCase()+ field.substring(1);
 				Method getterMethod = obj.getClass().getMethod(getterName);
 				Object fieldValue = getterMethod.invoke(obj);
@@ -206,27 +205,31 @@ public class ObjectDAOImpl implements ObjectDAO {
 		return null;
 	}
 	//testing remove b4 final code
-	public static void main(String[] args) {
-		
-		Account account = new Account();
-		ObjectDAO odjDao = new ObjectDAOImpl();
-		
-		//System.out.println(odjDao.getByContentByColumnNum("Alice",1,account));
-		//System.out.println(odjDao.getByContentByColumnNum("Alice",2,account));
-		//System.out.println(odjDao.getByContentByColumnNum("Bob",2,account));
-		//System.out.println(odjDao.getByContentByColumnNum("17401",5,account));
-		
-		List<Object> list = odjDao.getAll(account);
-		
-		for(Object obj: list) {
-			System.out.println(obj);
-		}
-		System.out.println("===============");
-		Account account2 = new Account("name1", "last1","username1","email@.com", 123456);
-		
-		odjDao.storeObject(account2);
-		//odjDao.updateRowByColumnNum("userNameUpdated2",3,"name1" ,1, account);
-		//odjDao.deleteRowByColumnNum("name1", 1, account);
-	}
+//	public static void main(String[] args) {
+//
+//		Account account = new Account();
+//		ObjectDAO odjDao = new ObjectDAOImpl();
+//		ObjectReflection obR = new ObjectReflection();
+//		System.out.println(odjDao.getByContentByColumnNum("Alice",1,account));
+//		System.out.println(odjDao.getByContentByColumnNum("Alice",2,account));
+//		System.out.println(odjDao.getByContentByColumnNum("Bob",2,account));
+//		System.out.println(odjDao.getByContentByColumnNum("17401",5,account));		
+//		List<Object> list = odjDao.getAll(account);
+//
+//		for(Object obj: list) {
+//			System.out.println(obj);
+//		}
+//		System.out.println("===============");
+//		Account account2 = new Account("name1", "last1","username1","email@.com", 123456);
+//
+//		//odjDao.storeObject(account2);
+//		//odjDao.updateRowByColumnNum("userNameUpdated2",3,"name1" ,1, account);
+//		//odjDao.deleteRowByColumnNum("name1", 1, account);
+//
+//		String [] stringarr = obR.returnParameterType(account);
+//		for(String str: stringarr) {
+//			System.out.println(str);
+//		}
+//	}
 
 }

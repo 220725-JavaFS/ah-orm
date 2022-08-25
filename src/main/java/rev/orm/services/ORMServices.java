@@ -28,7 +28,5 @@ public class ORMServices {
 	public Object deleteRowContentByColumn(String whereContent, int whereColumnNum, Object obj) {
 		return objDao.deleteRowByColumnNum(whereContent, whereColumnNum, obj);
 	}
-	
-	
-	
+
 }
