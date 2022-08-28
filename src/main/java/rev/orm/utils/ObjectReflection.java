@@ -7,7 +7,7 @@ public class ObjectReflection {
 	
 	/*
 	 * Takes the object and returns the parameter types in an array from the objects constructor
-	 * note it will only take object constructor with the highest parameter types
+	 * 
 	 */
 	public String[] returnParameterType(Object o){
 		

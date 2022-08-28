@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<connect>  
-    <ormConnection>  
-        <databaseUsername>DB_UN</databaseUsername>  
-        <databasePwd>DB_PWD</databasePwd>  
-        <databaseURL>DB_URL</databaseURL>   
-    </ormConnection>  
-</connect>  

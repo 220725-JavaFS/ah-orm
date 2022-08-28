@@ -204,32 +204,6 @@ public class ObjectDAOImpl implements ObjectDAO {
 
 		return null;
 	}
-	//testing remove b4 final code
-//	public static void main(String[] args) {
-//
-//		Account account = new Account();
-//		ObjectDAO odjDao = new ObjectDAOImpl();
-//		ObjectReflection obR = new ObjectReflection();
-//		System.out.println(odjDao.getByContentByColumnNum("Alice",1,account));
-//		System.out.println(odjDao.getByContentByColumnNum("Alice",2,account));
-//		System.out.println(odjDao.getByContentByColumnNum("Bob",2,account));
-//		System.out.println(odjDao.getByContentByColumnNum("17401",5,account));		
-//		List<Object> list = odjDao.getAll(account);
-//
-//		for(Object obj: list) {
-//			System.out.println(obj);
-//		}
-//		System.out.println("===============");
-//		Account account2 = new Account("name1", "last1","username1","email@.com", 123456);
-//
-//		//odjDao.storeObject(account2);
-//		//odjDao.updateRowByColumnNum("userNameUpdated2",3,"name1" ,1, account);
-//		//odjDao.deleteRowByColumnNum("name1", 1, account);
-//
-//		String [] stringarr = obR.returnParameterType(account);
-//		for(String str: stringarr) {
-//			System.out.println(str);
-//		}
-//	}
+
 
 }
